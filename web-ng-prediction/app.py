@@ -411,7 +411,9 @@ if menu == "🖥️ Prediksi NG":
                     prediction = model.predict(input_data)[0]
                     prediction_label = decode_prediction(prediction)
                     probabilities = model.predict_proba(input_data)[0]
+                    max_prob = float(max(probabilities))
 
+                    predicted_class = model.predict(input_data)[0]
                     kelas = [
                         "GOOD", "NG_JAHIT_LONCAT", "NG_NODA", 
                         "NG_PUCKER", "NG_ROBEK", "NG_TEPI_TIDAK_RAPI"
