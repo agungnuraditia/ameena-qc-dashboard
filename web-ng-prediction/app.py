@@ -489,7 +489,7 @@ if menu == "🖥️ Prediksi NG":
                         yaxis=dict(showgrid=False)
                     )
 
-                    st.plotly_chart(fig, use_container_width=True)
+                    st.plotly_chart(fig, use_container_width=True, key="grafik_probabilitas")
 
                 except Exception as e:
                     st.error(f"Error dalam memproses prediksi: {e}")
@@ -564,7 +564,7 @@ if menu == "🖥️ Prediksi NG":
                     xaxis=dict(showgrid=False, visible=False), yaxis=dict(showgrid=False, visible=False),
                     annotations=[dict(text="Belum ada data NG", x=0.5, y=0.5, showarrow=False, font=dict(color="#94A3B8", size=14))]
                 )
-            st.plotly_chart(fig_pie, use_container_width=True)
+           st.plotly_chart(fig_pie, use_container_width=True, key="grafik_pie_ng")
 
     with a2:
         with st.container(border=True):
@@ -596,7 +596,7 @@ if menu == "🖥️ Prediksi NG":
                     xaxis=dict(showgrid=False, visible=False), yaxis=dict(showgrid=False, visible=False),
                     annotations=[dict(text="Belum ada data NG", x=0.5, y=0.5, showarrow=False, font=dict(color="#94A3B8", size=14))]
                 )
-            st.plotly_chart(fig_line, use_container_width=True)
+            st.plotly_chart(fig_line, use_container_width=True, key="grafik_trend_harian")
 
     with a3:
         with st.container(border=True):
@@ -634,7 +634,7 @@ if menu == "🖥️ Prediksi NG":
                     xaxis=dict(showgrid=False, visible=False), yaxis=dict(showgrid=False, visible=False),
                     annotations=[dict(text="Belum ada data NG", x=0.5, y=0.5, showarrow=False, font=dict(color="#94A3B8", size=14))]
                 )
-            st.plotly_chart(fig_bar, use_container_width=True)
+            st.plotly_chart(fig_bar, use_container_width=True, key="grafik_bar_operator")
 
     # =====================================================
     # HISTORY SECTION
