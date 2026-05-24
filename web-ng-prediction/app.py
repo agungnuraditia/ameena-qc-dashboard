@@ -30,8 +30,10 @@ except Exception as e:
             return [0] 
         def predict_proba(self, df):
             if df["tipe_barang"].values[0] == "Hijab Maurin":
-                return [0.05, 0.10, 0.05, 0.15, 0.60, 0.05]
-            return [0.85, 0.03, 0.02, 0.05, 0.03, 0.02]
+                # Tambahkan kurung siku menjadi 2 dimensi [[ ... ]]
+                return [[0.05, 0.10, 0.05, 0.15, 0.60, 0.05]]
+            # Tambahkan kurung siku menjadi 2 dimensi [[ ... ]]
+            return [[0.85, 0.03, 0.02, 0.05, 0.03, 0.02]]
     model = DummyModel()
 
 # =====================================================
