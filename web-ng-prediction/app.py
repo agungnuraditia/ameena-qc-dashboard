@@ -23,6 +23,10 @@ st.set_page_config(
 try:
     model = joblib.load("model_rf.pkl")
 except Exception as e:
+    import streamlit as st
+    st.error(f"🚨 GAGAL MEMUAT MODEL ASLI: {e}")
+    # -----------------------------
+    
     class DummyModel:
         def predict(self, df):
             if df["tipe_barang"].values[0] == "Hijab Maurin":
@@ -30,12 +34,9 @@ except Exception as e:
             return [0] 
         def predict_proba(self, df):
             if df["tipe_barang"].values[0] == "Hijab Maurin":
-                # Tambahkan kurung siku menjadi 2 dimensi [[ ... ]]
                 return [[0.05, 0.10, 0.05, 0.15, 0.60, 0.05]]
-            # Tambahkan kurung siku menjadi 2 dimensi [[ ... ]]
             return [[0.85, 0.03, 0.02, 0.05, 0.03, 0.02]]
     model = DummyModel()
-
 # =====================================================
 # FUNCTION
 # =====================================================
