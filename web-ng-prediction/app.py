@@ -324,7 +324,7 @@ div[data-testid="stVerticalBlockBordered"] {
 import os
 
 logo_path = os.path.join("assets", "logo.png")
-st.sidebar.image(logo_path, width=145)
+# st.sidebar.image(logo_path, width=145)
 # Teks AMEENA BABY & KIDS STORE
 st.sidebar.markdown("""
 <div style="text-align: center; margin-top: 5px; margin-bottom: 35px;">
