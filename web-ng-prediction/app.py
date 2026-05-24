@@ -4,6 +4,7 @@ import joblib
 import plotly.graph_objects as go
 import plotly.express as px
 import datetime
+import os
 from io import BytesIO
 
 # =====================================================
@@ -23,9 +24,7 @@ st.set_page_config(
 try:
     model = joblib.load("web-ng-prediction/model_rf.pkl")
 except Exception as e:
-    import streamlit as st
     st.error(f"🚨 GAGAL MEMUAT MODEL ASLI: {e}")
-    # -----------------------------
     
     class DummyModel:
         def predict(self, df):
@@ -37,6 +36,7 @@ except Exception as e:
                 return [[0.05, 0.10, 0.05, 0.15, 0.60, 0.05]]
             return [[0.85, 0.03, 0.02, 0.05, 0.03, 0.02]]
     model = DummyModel()
+
 # =====================================================
 # FUNCTION
 # =====================================================
@@ -68,23 +68,24 @@ def get_download_data(df):
             return csv_data, "csv", "text/csv"
 
 # =====================================================
-# INITIALIZE SESSION STATE FOR ACTIVE HISTORY
+# INITIALIZE SESSION STATE FOR ACTIVE HISTORY (CSV)
 # =====================================================
-import os
 
-HISTORY_FILE = "history_data.csv"
+HISTORY_FILE = "riwayat_data.csv"
 
-def load_history():
+def get_history_from_csv():
+    # Ambil data dari CSV jika filenya ada
     if os.path.exists(HISTORY_FILE):
         return pd.read_csv(HISTORY_FILE)
-    else:
-        return pd.DataFrame(columns=["Waktu", "Tipe Barang", "Operator", "Prediksi"])
+    # Jika belum ada file CSV, kembalikan tabel kosong
+    return pd.DataFrame(columns=["Waktu", "Tipe Barang", "Operator", "Prediksi"])
 
-def save_history(df):
+def save_history_to_csv(df):
     df.to_csv(HISTORY_FILE, index=False)
 
-# Selalu baca dari file CSV setiap kali web diakses (lewat komputer / HP)
-st.session_state.history = load_history()
+# Muat data pertama kali saat web dibuka
+if "history" not in st.session_state:
+    st.session_state.history = get_history_from_csv()
 
 # =====================================================
 # CUSTOM CSS
@@ -103,9 +104,7 @@ st.markdown("""
     padding-bottom: 2rem !important;
 }
 
-/* =====================================================
-   SIDEBAR STYLE
-   ===================================================== */
+/* SIDEBAR STYLE */
 [data-testid="stSidebar"] {
     background-color: #0B1120 !important;
     border-right: none !important;
@@ -143,12 +142,10 @@ st.markdown("""
     gap: 8px !important;
 }
 
-/* Sembunyikan lingkaran bulat radio standar */
 [data-testid="stSidebar"] div[role="radiogroup"] > label > div:first-child {
     display: none !important;
 }
 
-/* Memaksa font navigasi menjadi putih sepenuhnya */
 [data-testid="stSidebar"] div[role="radiogroup"] > label,
 [data-testid="stSidebar"] div[role="radiogroup"] > label p,
 [data-testid="stSidebar"] div[role="radiogroup"] > label span {
@@ -183,21 +180,21 @@ st.markdown("""
     font-weight: 700 !important;
 }
 
-/* Kotak Informasi Bawah (Quality Intelligence) - DIBESARKAN */
+/* Kotak Informasi Bawah */
 .sidebar-info-box {
     background: #0F172A;
     border: 1px solid #1E293B;
     padding: 22px;
     border-radius: 14px;
-    font-size: 13.5px; /* Lebih besar dari 11.5px */
-    line-height: 1.7; /* Line height agar lega */
-    color: #CBD5E1; /* Warna abu-abu terang agar sangat mudah dibaca */
+    font-size: 13.5px;
+    line-height: 1.7;
+    color: #CBD5E1;
     margin-top: 10px;
     box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.1);
 }
 .sidebar-info-box strong {
     color: #FFFFFF;
-    font-size: 15px; /* Judul lebih besar */
+    font-size: 15px;
     display: flex;
     align-items: center;
     margin-bottom: 10px;
@@ -219,9 +216,7 @@ st.markdown("""
     letter-spacing: 0.05em;
 }
 
-/* =====================================================
-   MAIN AREA STYLE
-   ===================================================== */
+/* MAIN AREA STYLE */
 h1, h2, h3, h4, h5 {
     color: #0F172A;
     font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
@@ -314,12 +309,9 @@ div[data-testid="stVerticalBlockBordered"] {
 # SIDEBAR CONTENT
 # =====================================================
 
-# Ukuran logo dinaikkan secara drastis
-import os
-
 logo_path = os.path.join("assets", "logo.png")
 # st.sidebar.image(logo_path, width=145)
-# Teks AMEENA BABY & KIDS STORE
+
 st.sidebar.markdown("""
 <div style="text-align: center; margin-top: 5px; margin-bottom: 35px;">
     <h1 style="font-size: 18px; font-weight: 800; color: #FFFFFF; letter-spacing: 0.05em; margin: 0; font-family: 'Outfit', sans-serif; line-height: 1.4;">
@@ -342,7 +334,6 @@ st.sidebar.markdown("""
     </div>
 </div>
 """, unsafe_allow_html=True)
-
 
 # =====================================================
 # MAIN PAGE ROUTING
@@ -405,15 +396,13 @@ if menu == "🖥️ Prediksi NG":
                     prediction = model.predict(input_data)[0]
                     prediction_label = decode_prediction(prediction)
                     probabilities = model.predict_proba(input_data)[0]
-                    max_prob = float(max(probabilities))
-
-                    predicted_class = model.predict(input_data)[0]
+                    
                     kelas = [
                         "GOOD", "NG_JAHIT_LONCAT", "NG_NODA", 
                         "NG_PUCKER", "NG_ROBEK", "NG_TEPI_TIDAK_RAPI"
                     ]
 
-                    max_prob = round(max(probabilities) * 100, 2)
+                    max_prob = round(float(max(probabilities)) * 100, 2)
 
                     risk = "RENDAH"
                     risk_color_hex = "#10B981"
@@ -437,8 +426,15 @@ if menu == "🖥️ Prediksi NG":
                         "Prediksi": [prediction_label]
                     })
                     
-                    # =========== DI SINI PERUBAHAN BATAS MAKSIMUM MENJADI 100 ===========
-                    st.session_state.history = pd.concat([new_row, st.session_state.history], ignore_index=True).head(100)
+                    # --- LOGIKA PENYIMPANAN BARU (ANTI HILANG) ---
+                    # 1. Baca ulang semua data history lama yang ada di file CSV
+                    data_lama = get_history_from_csv()
+                    # 2. Gabungkan data prediksi baru ke posisi paling atas
+                    data_gabungan = pd.concat([new_row, data_lama], ignore_index=True).head(100)
+                    # 3. Timpa file CSV dengan data gabungan yang sudah lengkap
+                    save_history_to_csv(data_gabungan)
+                    # 4. Tampilkan data gabungan tersebut ke layar (update session state)
+                    st.session_state.history = data_gabungan
 
                     st.markdown(f"""
                     <div class="prediction-box" style="border-left: 6px solid {card_accent_color} !important;">
@@ -498,7 +494,7 @@ if menu == "🖥️ Prediksi NG":
                 st.info("Silakan tentukan input data di kolom kiri lalu klik tombol Prediksi NG untuk melihat hasil analisis.")
 
     # =====================================================
-    # MENGISI WADAH REKOMENDASI (Setelah Prediksi Selesai)
+    # MENGISI WADAH REKOMENDASI
     # =====================================================
     if not st.session_state.history.empty:
         latest_pred = st.session_state.history.iloc[0]["Prediksi"]
@@ -529,7 +525,7 @@ if menu == "🖥️ Prediksi NG":
                 """, unsafe_allow_html=True)
 
     # =====================================================
-    # ANALYTICS SECTION (GRAFIK DINAMIS SESUAI HISTORY)
+    # ANALYTICS SECTION
     # =====================================================
     st.write("")
     st.markdown("### 📈 Ringkasan & Analisis Tren Kualitas")
@@ -564,7 +560,7 @@ if menu == "🖥️ Prediksi NG":
                     xaxis=dict(showgrid=False, visible=False), yaxis=dict(showgrid=False, visible=False),
                     annotations=[dict(text="Belum ada data NG", x=0.5, y=0.5, showarrow=False, font=dict(color="#94A3B8", size=14))]
                 )
-        st.plotly_chart(fig_pie, use_container_width=True, key="grafik_pie_ng")
+            st.plotly_chart(fig_pie, use_container_width=True, key="grafik_pie_ng")
 
     with a2:
         with st.container(border=True):
@@ -682,7 +678,10 @@ if menu == "🖥️ Prediksi NG":
                 
                 if st.button("🗑️ Hapus Baris", use_container_width=True):
                     idx_del = delete_options.index(selected_del)
+                    # Hapus dari memori
                     st.session_state.history = st.session_state.history.drop(st.session_state.history.index[idx_del]).reset_index(drop=True)
+                    # Simpan data yang sudah dihapus ke dalam CSV agar tidak muncul lagi
+                    save_history_to_csv(st.session_state.history)
                     st.rerun()
             else:
                 st.caption("Tidak ada riwayat untuk dihapus.")
