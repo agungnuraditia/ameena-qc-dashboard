@@ -21,7 +21,7 @@ st.set_page_config(
 # =====================================================
 
 try:
-    model = joblib.load("model_rf.pkl")
+    model = joblib.load("web-ng-prediction/model_rf.pkl")
 except Exception as e:
     import streamlit as st
     st.error(f"🚨 GAGAL MEMUAT MODEL ASLI: {e}")
