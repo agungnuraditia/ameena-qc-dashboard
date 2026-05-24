@@ -70,30 +70,21 @@ def get_download_data(df):
 # =====================================================
 # INITIALIZE SESSION STATE FOR ACTIVE HISTORY
 # =====================================================
+import os
 
-if "history" not in st.session_state:
-    st.session_state.history = pd.DataFrame({
-        "Waktu": [
-            "23/05/2026 18:00",
-            "23/05/2026 17:30",
-            "23/05/2026 17:00"
-        ],
-        "Tipe Barang": [
-            "Hijab Maurin",
-            "Hijab Carla",
-            "Hijab Raina"
-        ],
-        "Operator": [
-            "Risman Sewing 1",
-            "Rifa Sewing 2",
-            "Iman Sewing 5"
-        ],
-        "Prediksi": [
-            "NG_ROBEK",
-            "NG_PUCKER",
-            "GOOD"
-        ]
-    })
+HISTORY_FILE = "history_data.csv"
+
+def load_history():
+    if os.path.exists(HISTORY_FILE):
+        return pd.read_csv(HISTORY_FILE)
+    else:
+        return pd.DataFrame(columns=["Waktu", "Tipe Barang", "Operator", "Prediksi"])
+
+def save_history(df):
+    df.to_csv(HISTORY_FILE, index=False)
+
+# Selalu baca dari file CSV setiap kali web diakses (lewat komputer / HP)
+st.session_state.history = load_history()
 
 # =====================================================
 # CUSTOM CSS
