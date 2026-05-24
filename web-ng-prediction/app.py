@@ -321,7 +321,7 @@ div[data-testid="stVerticalBlockBordered"] {
 # =====================================================
 
 # Ukuran logo dinaikkan secara drastis
-st.sidebar.image("assets/logo.png", width=145)
+st.sidebar.image("./assets/logo.png", width=145)
 
 # Teks AMEENA BABY & KIDS STORE
 st.sidebar.markdown("""
