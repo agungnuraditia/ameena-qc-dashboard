@@ -564,7 +564,7 @@ if menu == "🖥️ Prediksi NG":
                     xaxis=dict(showgrid=False, visible=False), yaxis=dict(showgrid=False, visible=False),
                     annotations=[dict(text="Belum ada data NG", x=0.5, y=0.5, showarrow=False, font=dict(color="#94A3B8", size=14))]
                 )
-           st.plotly_chart(fig_pie, use_container_width=True, key="grafik_pie_ng")
+        st.plotly_chart(fig_pie, use_container_width=True, key="grafik_pie_ng")
 
     with a2:
         with st.container(border=True):
