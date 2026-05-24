@@ -6,4 +6,5 @@ joblib
 plotly
 matplotlib
 openpyxl
+xlsxwriter
 Pillow
